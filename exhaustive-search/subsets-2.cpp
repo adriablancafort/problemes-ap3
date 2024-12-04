@@ -3,52 +3,43 @@
 #include <string>
 using namespace std;
 
-using VB = vector<bool>;
-using VS = vector<string>;
-
-int n;
-VS llista;
-VB contained;
-
-void print_subset() {
-	bool first = true;
-	cout << "{";
-	for (int i = 0; i < n; i++) {
-		if (contained[i]) {
-			if (first) first = false;
-			else cout << ","; 
-			cout << llista[i];
-		}
-	}
-	cout << "}" << endl;
+void print_subset(const vector<string>& words, const vector<bool>& choosen) {
+    cout << "{";
+    bool first = true;
+    for (int i = 0; i < words.size(); i++) {
+        if(choosen[i]) {
+            if (first) first = false;
+            else cout << ",";
+            cout << words[i];
+        }
+    }
+    cout << "}" << endl;
 }
 
-void allperms(int i, int m) {
-	if (m < 0) return;
-    // Espais que queden menors als uns que ens falta posar
-    if (n - i < m) return;
-	
-	if (i == n) {
-		if (m == 0) print_subset();
-	} else {
-		contained[i] = false; allperms(i + 1, m);
-		contained[i] = true; allperms(i + 1, m - 1);
-	}
+void rec(const vector<string>& words, vector<bool>& choosen, int pos, int remaining) {
+    if(remaining == 0) {
+        print_subset(words, choosen);
+        return;
+    }
+    
+    if(pos < words.size() and words.size() - pos >= remaining) {
+        choosen[pos] = true;
+        rec(words, choosen, pos + 1, remaining - 1);
+        
+        choosen[pos] = false;
+        rec(words, choosen, pos + 1, remaining);
+    }
 }
 
 int main() {
-    int m;
-
+    int m, n;
     cin >> m >> n;
 
-    contained = VB(n);
-    llista = VS(n);
+    vector<string> words(n);
+    for(string &word : words) cin >> word;
 
-    for (string &e : llista) {
-        cin >> e;
-    }
-
-    allperms(0, m);
+    vector<bool> choosen(n, false);
+    rec(words, choosen, 0, m);
 
     return 0;
 }
