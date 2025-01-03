@@ -1,39 +1,40 @@
 #include <iostream>
-#include <string>
 #include <vector>
-#include <algorithm>
+#include <string>
 using namespace std;
 
-string longestCommonSubword(string& w1, string& w2) {
-    int n1 = w1.size();
-    int n2 = w2.size();
-    vector<vector<int>> dp(n1 + 1, vector<int>(n2 + 1, 0));
-    int maxLength = 0;
-    vector<string> longestSubwords;
-
-    for (int i = 1; i <= n1; ++i) {
-        for (int j = 1; j <= n2; ++j) {
-            if (w1[i - 1] == w2[j - 1]) {
-                dp[i][j] = dp[i - 1][j - 1] + 1;
-                if (dp[i][j] > maxLength) {
-                    maxLength = dp[i][j];
-                    longestSubwords.clear();
-                    longestSubwords.push_back(w1.substr(i - maxLength, maxLength));
-                } else if (dp[i][j] == maxLength) {
-                    longestSubwords.push_back(w1.substr(i - maxLength, maxLength));
-                }
-            }
-        }
+bool is_alphabetically_smaller(string& w1, int i, int maxindex, int maxsize) {
+    for (int k = 0; k < maxsize; ++k) {
+        if (w1[i - maxsize + k] < w1[maxindex - maxsize + k]) return true;
+        if (w1[i - maxsize + k] > w1[maxindex - maxsize + k]) return false;
     }
-
-    if (longestSubwords.empty()) return "";
-    sort(longestSubwords.begin(), longestSubwords.end());
-    return longestSubwords[0];
+    return false;
 }
 
 int main() {
-    string w1, w2;
-    while (cin >> w1 >> w2) {
-        cout << longestCommonSubword(w1, w2) << endl;
-    }
+	string w1, w2;
+	while (cin >> w1 >> w2) {
+		int n = w1.size();
+		int m = w2.size();
+		vector<vector<int> > mat(n+1, vector<int> (m+1, 0));
+		int maxsize = 0;
+        int maxindex = 0;
+		for (int i = 1; i <= n; i++) {
+			for (int j = 1; j <= m; j++) {
+                // check all letters that match and add 1 to the previous match count
+				if(w1[i-1] == w2[j-1]) mat[i][j] = mat[i-1][j-1] + 1;
+                // if the current match is bigger than the previous, update maxsize and maxindex.
+				if (mat[i][j] > maxsize) {
+                    maxsize = mat[i][j];
+                    maxindex = i;
+                // if the current match is equal to the previous, check if the current word is lexicographically smaller than the previous.
+                } else if (mat[i][j] == maxsize) {
+                    if (is_alphabetically_smaller(w1, i, maxindex, maxsize)) {
+                        maxindex = i;
+                    }
+                }
+			}
+		}
+        cout << w1.substr(maxindex - maxsize, maxsize) << endl;
+	}
 }
