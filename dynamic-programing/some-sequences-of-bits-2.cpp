@@ -1,24 +1,24 @@
 #include <iostream>
 #include <vector>
 using namespace std;
-
-vector<vector<vector<vector<long long>>>> memo;
-
-long long rec(int z, int u, int cons_z, int cons_u) {
-    if (z < 0 or u < 0) return 0;                      // Check bounds first
-    if (cons_z >= 2 or cons_u >= 3) return 0;         // Check valid sequence
-    if (z == 0 and u == 0) return 1;                  // Base case
-
-    if (memo[z][u][cons_z][cons_u] != -1) return memo[z][u][cons_z][cons_u];
-
-    memo[z][u][cons_z][cons_u] = rec(z-1, u, cons_z+1, 0) + rec(z, u-1, 0, cons_u+1);
-    return memo[z][u][cons_z][cons_u];
-}
+typedef long long int lint;
 
 int main() {
-    int z, u;
-    while(cin >> z >> u) {
-        memo = vector<vector<vector<vector<long long>>>>(z+1, vector<vector<vector<long long>>>(u+1, vector<vector<long long>>(3, vector<long long>(4, -1))));
-        cout << rec(z, u, 0, 0) << endl;
-    }
+	vector<vector<lint>> s(91, vector<lint> (92, 0));
+	s[0][1] = s[1][1] = s[0][2] = s[0][3] = s[1][5] = 1;
+	s[1][2] = s[1][4] = 2;
+	s[1][3] = 3;
+
+	int z, u;
+	while(cin >> z >> u){
+		u++;
+
+		for(int i = 2; i <= z; i++){
+			for(int j = 2; j <= u; ++j){
+				s[i][j] = s[i-1][j-1] + s[i-1][j-2];
+			}
+		}
+
+		cout << s[z][u] << endl;
+	}
 }
